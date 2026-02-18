@@ -36,6 +36,10 @@ function getAnthropicClient(): Anthropic {
 }
 
 function buildSystemPrompt(persona: AgentPersona, language: string): string {
+  // Strip example_lines from persona before serializing — they're too literal
+  // and cause the model to repeat them verbatim across unrelated sessions.
+  const { example_lines, ...personaCore } = persona as AgentPersona & { example_lines?: string[] };
+
   return [
     `You are the MOST EXTREME version of MBTI type ${persona.type}. Every trait is dialed to 100%.`,
     "Be a caricature — over-the-top, unmistakable. Never moderate your personality.",
@@ -49,13 +53,14 @@ function buildSystemPrompt(persona: AgentPersona, language: string): string {
     `If you're P: open-ended, hates being pinned down, detours constantly.`,
     `User language preference: ${language}. Default to Korean when language is ko.`,
     "You are in a KakaoTalk group chat. Keep each message SHORT — 1 to 2 sentences max, like texting. No long paragraphs.",
+    "IMPORTANT: Generate fresh, topic-specific responses every time. Never repeat memorized phrases.",
     "Return ONLY raw JSON — no code fences, no markdown, no extra text before or after.",
     'Exact shape: {"message":"...","next_speaker":"TYPE","done":false}',
     "Rules:",
     "- next_speaker must be one of the 3 council types.",
     "- done=true only if discussion has naturally concluded.",
     "- No code fences. No backticks. Raw JSON only.",
-    `Persona calibration: ${JSON.stringify(persona)}`,
+    `Persona calibration: ${JSON.stringify(personaCore)}`,
   ].join("\n");
 }
 
@@ -259,8 +264,22 @@ export async function runCouncilStreamOrchestration(input: {
     }
   }
 
-  // Verdict generation removed — kept in stream route for future use
-  return [];
+  const transcript = messages.map((m) => `${m.type}: ${m.content}`).join("\n");
+
+  const verdictLines = await Promise.all(
+    input.types.map(async (type) => ({
+      type,
+      line: await generateVerdictLine({
+        type,
+        persona: personas[type],
+        question: input.question,
+        language: input.language,
+        transcript,
+      }),
+    }))
+  );
+
+  return verdictLines;
 }
 
 /**

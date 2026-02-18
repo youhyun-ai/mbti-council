@@ -18,14 +18,24 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   // Try to load from DB first for accurate OG meta
   const saved = await getCouncil(id);
   const question = saved?.question || sp.question || "MBTI 토론회";
-  const types = saved ? saved.types.join(" vs ") : (sp.types ? sp.types.split(",").join(" vs ") : "MBTI 패널");
-  const description = `MBTI 토론회: ${types}`;
+  const types = saved ? saved.types.join(" × ") : (sp.types ? sp.types.split(",").join(" × ") : "MBTI 패널");
+  const description = `${types}의 토론 — ${question} — vitric.ai`;
+  const cardImage = `/api/council/${id}/card?format=square`;
 
   return {
     title: question,
     description,
-    openGraph: { title: question, description },
-    twitter: { card: "summary_large_image", title: question, description },
+    openGraph: {
+      title: question,
+      description,
+      images: [cardImage],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: question,
+      description,
+      images: [cardImage],
+    },
   };
 }
 

@@ -378,6 +378,42 @@ export function CouncilClient({
     }
   };
 
+  const handleCardShare = async () => {
+    if (typeof window === "undefined") return;
+
+    const cardUrl = `${window.location.origin}/api/council/${data.id}/card`;
+
+    if (navigator.canShare && navigator.share) {
+      try {
+        const probe = new File([new Blob(["x"], { type: "text/plain" })], "probe.txt", {
+          type: "text/plain",
+        });
+
+        if (navigator.canShare({ files: [probe] })) {
+          const response = await fetch(cardUrl);
+          if (!response.ok) throw new Error("card fetch failed");
+
+          const blob = await response.blob();
+          const file = new File([blob], `mbti-council-${data.id}.png`, {
+            type: "image/png",
+          });
+
+          await navigator.share({
+            title: "MBTI 토론 판결문",
+            text: `${data.question} — ${data.types.join(" × ")} 토론`,
+            files: [file],
+            url: window.location.href,
+          });
+          return;
+        }
+      } catch {
+        // fallback below
+      }
+    }
+
+    window.open(cardUrl, "_blank", "noopener,noreferrer");
+  };
+
   if (fetchError && !data.messages.length) {
     return (
       <div className="rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-700 ring-1 ring-rose-200">
@@ -561,11 +597,20 @@ export function CouncilClient({
                     await navigator.clipboard.writeText(window.location.href);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 1600);
-                  } catch { /* nothing */ }
+                  } catch {
+                    /* nothing */
+                  }
                 }}
                 className="rounded-full bg-white/80 px-4 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-white"
               >
                 {copied ? "복사됨!" : "링크 복사"}
+              </button>
+              <button
+                type="button"
+                onClick={handleCardShare}
+                className="rounded-full bg-[#FEE500] px-4 py-1.5 text-xs font-bold text-gray-900 shadow-sm hover:brightness-95"
+              >
+                카드 공유 🏆
               </button>
             </div>
           )}
