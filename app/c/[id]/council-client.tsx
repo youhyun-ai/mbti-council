@@ -128,6 +128,7 @@ export function CouncilClient({
     return {};
   });
   const [copied, setCopied] = useState(false); // fallback copy feedback
+  const [questionExpanded, setQuestionExpanded] = useState(false);
   const [modelDisplay, setModelDisplay] = useState<string | null>(null);
   const [userInput, setUserInput] = useState("");
   const [overtimeStatus, setOvertimeStatus] = useState<"idle" | "streaming">("idle");
@@ -390,9 +391,26 @@ export function CouncilClient({
       {/* ── Header ── */}
       <header className="shrink-0 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-gray-200">
         <p className="text-[11px] font-bold text-fuchsia-700">MBTI 토론회</p>
-        <h1 className="mt-0.5 line-clamp-1 text-base font-black leading-snug">
-          {data.question || "MBTI 토론"}
-        </h1>
+        <button
+          type="button"
+          onClick={() => setQuestionExpanded((v) => !v)}
+          className="mt-0.5 w-full text-left"
+        >
+          <h1
+            className={[
+              "text-base font-black leading-snug",
+              questionExpanded ? "" : "line-clamp-1",
+            ].join(" ")}
+          >
+            {data.question || "MBTI 토론"}
+          </h1>
+          {!questionExpanded && (data.question?.length ?? 0) > 30 && (
+            <span className="text-[10px] font-semibold text-gray-400">더보기</span>
+          )}
+          {questionExpanded && (
+            <span className="text-[10px] font-semibold text-gray-400">접기</span>
+          )}
+        </button>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           {modelDisplay && (
             <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">
@@ -531,15 +549,28 @@ export function CouncilClient({
             </div>
           )}
 
-          {/* Share button */}
+          {/* Share buttons */}
           {data.status === "done" && overtimeStatus === "idle" && (
-            <div className="px-1 pb-1">
+            <div className="flex gap-2 px-1 pb-1">
               <button
                 type="button"
                 onClick={handleShare}
                 className="rounded-full bg-white/80 px-4 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-white"
               >
-                {copied ? "링크 복사됨!" : "공유"}
+                공유
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1600);
+                  } catch { /* nothing */ }
+                }}
+                className="rounded-full bg-white/80 px-4 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-white"
+              >
+                {copied ? "복사됨!" : "링크 복사"}
               </button>
             </div>
           )}
