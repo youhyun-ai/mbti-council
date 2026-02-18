@@ -544,77 +544,33 @@ export function CouncilClient({
             </div>
           )}
 
-          {/* Verdict */}
-          {data.status === "done" &&
-            overtimeStatus === "idle" &&
-            data.verdict &&
-            data.verdict.length > 0 && (
-              <section className="mt-2 rounded-3xl border border-fuchsia-200 bg-gradient-to-br from-white to-fuchsia-50 p-5 shadow-md shadow-fuchsia-100/60">
-                <p className="text-xs font-bold text-fuchsia-700">
-                  최종 한줄 결론
-                </p>
-                <h2 className="mt-1 line-clamp-2 text-base font-black sm:text-lg">
-                  {data.question.length > 120
-                    ? data.question.slice(0, 120) + "..."
-                    : data.question}
-                </h2>
-
-                <div className="mt-4 space-y-2">
-                  {data.verdict.map((line) => {
-                    const found = mbtiMap.get(line.type);
-                    if (!found) return null;
-                    const style = GROUP_STYLES[found.group];
-
-                    return (
-                      <div
-                        key={line.type}
-                        className="rounded-xl bg-white p-3 ring-1 ring-gray-200"
-                      >
-                        <p
-                          className={[
-                            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-extrabold",
-                            style.badge,
-                          ].join(" ")}
-                        >
-                          <span>{found.emoji}</span>
-                          {line.type}
-                        </p>
-                        <p className="mt-1 text-sm text-gray-800">
-                          {line.line}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                  <button
-                    type="button"
-                    onClick={handleCopyLink}
-                    className="rounded-xl bg-gray-900 px-3 py-2 text-sm font-bold text-white hover:bg-black"
-                  >
-                    {copied ? "링크 복사됨!" : "링크 복사"}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleKakaoShare}
-                    className="rounded-xl bg-[#FEE500] px-3 py-2 text-sm font-bold text-gray-900 hover:brightness-95"
-                  >
-                    카카오톡 공유
-                  </button>
-
-                  <a
-                    href={xShareUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-xl bg-sky-500 px-3 py-2 text-sm font-bold text-white hover:bg-sky-600"
-                  >
-                    X 공유
-                  </a>
-                </div>
-              </section>
-            )}
+          {/* Share buttons — shown when done, no verdict card */}
+          {data.status === "done" && overtimeStatus === "idle" && (
+            <div className="flex gap-2 px-1 pb-1">
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-white"
+              >
+                {copied ? "복사됨!" : "링크 복사"}
+              </button>
+              <button
+                type="button"
+                onClick={handleKakaoShare}
+                className="rounded-full bg-[#FEE500] px-3 py-1.5 text-xs font-bold text-gray-900 shadow-sm hover:brightness-95"
+              >
+                카카오톡 공유
+              </button>
+              <a
+                href={xShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-white"
+              >
+                X 공유
+              </a>
+            </div>
+          )}
 
           {/* Scroll anchor */}
           <div ref={bottomRef} className="h-1" />

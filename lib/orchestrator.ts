@@ -259,21 +259,8 @@ export async function runCouncilStreamOrchestration(input: {
     }
   }
 
-  const transcript = messages.map((m) => `${m.type}: ${m.content}`).join("\n");
-  const verdict: VerdictLine[] = [];
-
-  for (const type of input.types) {
-    const line = await generateVerdictLine({
-      type,
-      persona: personas[type],
-      question: input.question,
-      language: input.language,
-      transcript,
-    });
-    verdict.push({ type, line });
-  }
-
-  return verdict;
+  // Verdict generation removed — kept in stream route for future use
+  return [];
 }
 
 /**
