@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { incrementCouncilCount } from "@/lib/counter";
+import { saveCouncil } from "@/lib/council-db";
 import { normalizeType, isValidMbtiType, type MbtiType } from "@/lib/mbti";
 import { checkAndConsumeDailyCouncilLimit } from "@/lib/rate-limit";
 
@@ -59,7 +59,17 @@ export async function POST(request: NextRequest) {
   }
 
   const id = randomUUID();
-  void incrementCouncilCount();
+
+  // Save stub immediately so counter reflects every started council
+  void saveCouncil({
+    id,
+    question,
+    language,
+    types: uniqueTypes as MbtiType[],
+    messages: [],
+    verdict: null,
+    status: "in-progress",
+  });
 
   return NextResponse.json({
     id,

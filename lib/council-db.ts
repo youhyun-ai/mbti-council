@@ -37,8 +37,7 @@ export async function getCouncilCount(): Promise<number | null> {
   try {
     const { count } = await db
       .from("councils")
-      .select("*", { count: "exact", head: true })
-      .eq("status", "done");
+      .select("*", { count: "exact", head: true });
     return count ?? 0;
   } catch {
     return null;
