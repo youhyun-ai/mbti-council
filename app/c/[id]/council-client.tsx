@@ -390,7 +390,7 @@ export function CouncilClient({
     <div className="flex h-screen flex-col bg-[#b2c7d8]">
       {/* ── Header ── */}
       <header className="shrink-0 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-gray-200">
-        <p className="text-[11px] font-bold text-fuchsia-700">MBTI 토론회</p>
+        <p className="text-[11px] font-bold text-fuchsia-700">MBTI 단톡</p>
         <button
           type="button"
           onClick={() => setQuestionExpanded((v) => !v)}
@@ -412,12 +412,7 @@ export function CouncilClient({
           )}
         </button>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          {modelDisplay && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500">
-              <span>✦</span>
-              {modelDisplay}
-            </span>
-          )}
+          {/* model badge hidden — breaks immersion */}
           {data.types.map((code) => {
             const found = mbtiMap.get(code);
             if (!found) return null;
@@ -591,7 +586,7 @@ export function CouncilClient({
             onKeyDown={handleKeyDown}
             disabled={isStreaming}
             placeholder={
-              isStreaming ? "MBTI들이 얘기 중..." : "토론에 끼어들기... 💬"
+              isStreaming ? "읽는 중... 🫣" : "토론에 끼어들기... 💬"
             }
             className={[
               "flex-1 rounded-full border px-4 py-2 text-sm outline-none transition-colors",

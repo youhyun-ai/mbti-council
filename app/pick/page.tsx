@@ -76,12 +76,12 @@ export default function PickPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-amber-50 px-4 py-6 text-gray-900 sm:py-10">
       <div className="mx-auto w-full max-w-md">
-        <h1 className="text-2xl font-black">패널 3명을 골라주세요</h1>
-        <p className="mt-1 text-sm text-gray-600">성격이 다른 3명이 모이면 토론이 더 재밌어져요 ✨</p>
+        <h1 className="text-2xl font-black">지금 단톡에 누구 부를까?</h1>
+        <p className="mt-1 text-sm text-gray-600">섞일수록 더 재밌어짐. 나랑 반대 유형도 불러봐.</p>
 
         <div className="mt-3 rounded-xl bg-white/80 p-3 text-sm shadow-sm ring-1 ring-gray-200">
-          선택됨: <span className="font-extrabold">{selected.length}/3</span>
-          {selected.length >= 3 ? <span className="ml-1 text-rose-500">(딱 3명 선택 완료)</span> : null}
+          <span className="font-extrabold">{selected.length}명</span> 합류 중
+          {selected.length >= 3 ? <span className="ml-1 text-rose-500">· 꽉 참 🔥</span> : <span className="text-gray-400"> (최대 3명)</span>}
         </div>
 
         <form className="mt-5 space-y-5" onSubmit={onSubmit}>
@@ -127,7 +127,7 @@ export default function PickPage() {
               id="question"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="질문이든 상황이든 뭐든 — ex) 나 우울해서 머리했어"
+              placeholder="아무거나 — ex) 나 우울해서 머리했어 ✂️"
               className="min-h-28 w-full rounded-2xl border border-gray-200 bg-white p-3 text-sm shadow-sm outline-none ring-fuchsia-300 placeholder:text-gray-400 focus:ring"
               maxLength={240}
             />
@@ -141,7 +141,7 @@ export default function PickPage() {
             disabled={!canSubmit}
             className="flex min-h-14 w-full items-center justify-center rounded-2xl bg-gray-900 text-base font-extrabold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-gray-300"
           >
-            {loading ? "토론 준비 중..." : "토론 시작!"}
+            {loading ? "단톡 여는 중..." : "단톡 시작"}
           </button>
         </form>
       </div>
