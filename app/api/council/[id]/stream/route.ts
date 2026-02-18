@@ -62,10 +62,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       });
 
       await writeSse(writer, encoder, { type: "verdict", payload: verdict });
-      await writeSse(writer, encoder, { type: "done" });
 
-      // Persist to Supabase for sharing
-      void saveCouncil({
+      // Persist to Supabase before signaling done — must await or Vercel kills the fn first
+      await saveCouncil({
         id,
         question,
         language,
@@ -74,6 +73,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         verdict,
         status: "done",
       });
+
+      await writeSse(writer, encoder, { type: "done" });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown orchestration error";
       await writeSse(writer, encoder, { type: "error", payload: { message } });
