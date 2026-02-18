@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
   const question = body.question?.trim() ?? "";
   const language = (body.language?.trim() || "ko").toLowerCase();
 
-  if (uniqueTypes.length !== 3) {
-    return NextResponse.json({ error: "Exactly 3 unique MBTI types are required" }, { status: 400 });
+  if (uniqueTypes.length < 1 || uniqueTypes.length > 3) {
+    return NextResponse.json({ error: "1~3개의 MBTI 타입을 선택해주세요" }, { status: 400 });
   }
 
   const invalidType = uniqueTypes.find((type) => !isValidMbtiType(type));

@@ -38,8 +38,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const language = (request.nextUrl.searchParams.get("language")?.trim() || "ko").toLowerCase();
   const types = parseTypes(request.nextUrl.searchParams.get("types"));
 
-  if (!question || types.length !== 3) {
-    return new Response("Missing required query params: question, types(3)", { status: 400 });
+  if (!question || types.length < 1 || types.length > 3) {
+    return new Response("Missing required query params: question, types(1-3)", { status: 400 });
   }
 
   const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();

@@ -35,7 +35,12 @@ function getAnthropicClient(): Anthropic {
   return anthropicClient;
 }
 
-function buildSystemPrompt(persona: AgentPersona, language: string): string {
+function buildSystemPrompt(persona: AgentPersona, language: string, types: MbtiType[]): string {
+  const participants = types.join(", ");
+  const chatContext = types.length === 1
+    ? "You are reacting to a situation in a KakaoTalk chat, as if talking to yourself or the user."
+    : "You are in a KakaoTalk group chat.";
+
   return [
     `You are the MOST EXTREME version of MBTI type ${persona.type}. Every trait is dialed to 100%.`,
     "Be a caricature — over-the-top, unmistakable. Never moderate your personality.",
@@ -48,11 +53,11 @@ function buildSystemPrompt(persona: AgentPersona, language: string): string {
     `If you're J: decisive, impatient, needs a plan and a conclusion NOW.`,
     `If you're P: open-ended, hates being pinned down, detours constantly.`,
     `User language preference: ${language}. Default to Korean when language is ko.`,
-    "You are in a KakaoTalk group chat. Keep each message SHORT — 1 to 2 sentences max, like texting. No long paragraphs.",
+    `${chatContext} Keep each message SHORT — 1 to 2 sentences max, like texting. No long paragraphs.`,
     "Return ONLY raw JSON — no code fences, no markdown, no extra text before or after.",
     'Exact shape: {"message":"...","next_speaker":"TYPE","done":false}',
     "Rules:",
-    "- next_speaker must be one of the 3 council types.",
+    `- next_speaker must be one of: ${participants}.`,
     "- done=true only if discussion has naturally concluded.",
     "- No code fences. No backticks. Raw JSON only.",
     `Persona calibration: ${JSON.stringify(persona)}`,
@@ -153,7 +158,7 @@ async function runSingleTurn(input: {
   question: string;
   history: Array<{ type: string; content: string }>;
 }): Promise<{ message: string; nextSpeaker: MbtiType; done: boolean }> {
-  const system = buildSystemPrompt(input.personas[input.speaker], input.language);
+  const system = buildSystemPrompt(input.personas[input.speaker], input.language, input.types);
   const historyText = input.history
     .map((item, idx) => `${idx + 1}. ${item.type}: ${item.content}`)
     .join("\n");

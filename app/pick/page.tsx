@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { MbtiTypeCard } from "@/app/components/mbti-type-card";
 import { GROUP_LABEL, GROUP_STYLES, MBTI_TYPES } from "@/app/lib/mbti";
 
+const MIN_SELECTION = 1;
 const MAX_SELECTION = 3;
 
 export default function PickPage() {
@@ -14,7 +15,7 @@ export default function PickPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const canSubmit = selected.length === MAX_SELECTION && question.trim().length > 0 && !loading;
+  const canSubmit = selected.length >= MIN_SELECTION && question.trim().length > 0 && !loading;
 
   const grouped = useMemo(() => {
     return {
@@ -76,12 +77,12 @@ export default function PickPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-indigo-50 via-white to-amber-50 px-4 py-6 text-gray-900 sm:py-10">
       <div className="mx-auto w-full max-w-md">
-        <h1 className="text-2xl font-black">패널 3명을 골라주세요</h1>
-        <p className="mt-1 text-sm text-gray-600">성격이 다른 3명이 모이면 토론이 더 재밌어져요 ✨</p>
+        <h1 className="text-2xl font-black">패널을 골라주세요</h1>
+        <p className="mt-1 text-sm text-gray-600">1~3명을 고르면 토론이 시작돼요 ✨</p>
 
         <div className="mt-3 rounded-xl bg-white/80 p-3 text-sm shadow-sm ring-1 ring-gray-200">
           선택됨: <span className="font-extrabold">{selected.length}/3</span>
-          {selected.length >= 3 ? <span className="ml-1 text-rose-500">(딱 3명 선택 완료)</span> : null}
+          {selected.length >= 3 ? <span className="ml-1 text-rose-500">(최대 선택)</span> : null}
         </div>
 
         <form className="mt-5 space-y-5" onSubmit={onSubmit}>
