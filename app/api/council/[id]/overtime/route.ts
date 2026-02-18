@@ -50,8 +50,8 @@ export async function POST(
     )
   );
 
-  if (!question || types.length < 1 || types.length > 3) {
-    return new Response("Missing required fields: question, types(1-3)", {
+  if (!question || types.length !== 3) {
+    return new Response("Missing required fields: question, types(3)", {
       status: 400,
     });
   }
