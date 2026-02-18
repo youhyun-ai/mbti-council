@@ -1,4 +1,4 @@
-const MAX_REQUESTS_PER_DAY = 3;
+const MAX_REQUESTS_PER_DAY = 10;
 
 type RateLimitRecord = {
   dateKey: string;
