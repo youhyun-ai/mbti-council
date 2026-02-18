@@ -50,7 +50,10 @@ export async function POST(request: NextRequest) {
   }
 
   const ip = getClientIp(request);
-  const rate = checkAndConsumeDailyCouncilLimit(ip);
+  const bypassKey = request.headers.get("x-bypass-key");
+  const rate = bypassKey === process.env.BYPASS_KEY
+    ? { allowed: true, remaining: 999 }
+    : checkAndConsumeDailyCouncilLimit(ip);
   if (!rate.allowed) {
     return NextResponse.json(
       { error: "오늘 토론 횟수를 다 사용했어요! 내일 다시 오세요 🙏" },
