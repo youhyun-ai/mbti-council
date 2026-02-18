@@ -60,8 +60,8 @@ export async function POST(request: NextRequest) {
 
   const id = randomUUID();
 
-  // Save stub immediately so counter reflects every started council
-  void saveCouncil({
+  // Await stub save — void doesn't work on Vercel (fn killed after response)
+  await saveCouncil({
     id,
     question,
     language,
