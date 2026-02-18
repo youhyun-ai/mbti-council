@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LandingDemo } from "@/app/components/LandingDemo";
 import { getCouncilCount } from "@/lib/counter";
 
 export const dynamic = "force-dynamic"; // always fetch fresh count
@@ -51,8 +52,10 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      <section className="mx-auto max-w-3xl px-5 pb-16">
-        <h2 className="text-lg font-extrabold">이런 주제로 떠봤어요</h2>
+      <LandingDemo />
+
+      <section className="mx-auto max-w-3xl px-5 pb-16 pt-12">
+        <h2 className="text-lg font-extrabold">예시 토론</h2>
         <div className="mt-4 space-y-3">
           {EXAMPLES.map((item) => (
             <article key={item.label} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

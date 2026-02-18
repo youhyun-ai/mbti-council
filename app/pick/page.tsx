@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MbtiTypeCard } from "@/app/components/mbti-type-card";
+import { MbtiToast, MBTI_JOIN_LINES } from "@/app/components/MbtiToast";
 import { GROUP_LABEL, GROUP_STYLES, MBTI_TYPES } from "@/app/lib/mbti";
 
 const MAX_SELECTION = 3;
@@ -12,6 +13,7 @@ export default function PickPage() {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const canSubmit = selected.length === MAX_SELECTION && question.trim().length > 0 && !loading;
@@ -28,8 +30,16 @@ export default function PickPage() {
   const toggleType = (code: string) => {
     setError(null);
     setSelected((prev) => {
-      if (prev.includes(code)) return prev.filter((v) => v !== code);
+      const line = MBTI_JOIN_LINES[code];
+
+      if (prev.includes(code)) {
+        setToastMessage(line?.leave ?? `${code}가 자리를 떴습니다.`);
+        return prev.filter((v) => v !== code);
+      }
+
       if (prev.length >= MAX_SELECTION) return prev;
+
+      setToastMessage(line?.join ?? `${code}가 합류했습니다 👋`);
       return [...prev, code];
     });
   };
@@ -145,6 +155,8 @@ export default function PickPage() {
           </button>
         </form>
       </div>
+
+      <MbtiToast message={toastMessage} />
     </main>
   );
 }
