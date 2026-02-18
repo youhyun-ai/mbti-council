@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getCouncilCount } from "@/lib/counter";
 
+export const dynamic = "force-dynamic"; // always fetch fresh count
+
 const EXAMPLES = [
   {
     title: "썸 연락 텀",
