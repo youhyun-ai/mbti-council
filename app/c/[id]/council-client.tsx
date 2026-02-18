@@ -127,7 +127,7 @@ export function CouncilClient({
     }
     return {};
   });
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false); // fallback copy feedback
   const [modelDisplay, setModelDisplay] = useState<string | null>(null);
   const [userInput, setUserInput] = useState("");
   const [overtimeStatus, setOvertimeStatus] = useState<"idle" | "streaming">("idle");
@@ -353,41 +353,28 @@ export function CouncilClient({
     }
   };
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      setCopied(false);
-    }
-  };
-
   const shareText = data
     ? `${data.question}\n\nMBTI 토론회: ${data.types.join(" vs ")}`
     : "MBTI 토론회";
-  const currentUrl =
-    typeof window !== "undefined" ? window.location.href : "";
-  const xShareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(currentUrl)}`;
 
-  const handleKakaoShare = async () => {
+  const handleShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: "MBTI 토론회",
-          text: shareText,
-          url: window.location.href,
-        });
+        await navigator.share({ title: "MBTI 토론회", text: shareText, url });
         return;
       } catch {
-        // fallback below
+        // user cancelled or not supported — fall through
       }
     }
-    window.open(
-      "https://sharer.kakao.com/talk/friends/picker/link",
-      "_blank",
-      "noopener,noreferrer"
-    );
+    // Fallback: copy link
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      // nothing
+    }
   };
 
   if (fetchError && !data.messages.length) {
@@ -544,31 +531,16 @@ export function CouncilClient({
             </div>
           )}
 
-          {/* Share buttons — shown when done, no verdict card */}
+          {/* Share button */}
           {data.status === "done" && overtimeStatus === "idle" && (
-            <div className="flex gap-2 px-1 pb-1">
+            <div className="px-1 pb-1">
               <button
                 type="button"
-                onClick={handleCopyLink}
-                className="rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-white"
+                onClick={handleShare}
+                className="rounded-full bg-white/80 px-4 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-white"
               >
-                {copied ? "복사됨!" : "링크 복사"}
+                {copied ? "링크 복사됨!" : "공유"}
               </button>
-              <button
-                type="button"
-                onClick={handleKakaoShare}
-                className="rounded-full bg-[#FEE500] px-3 py-1.5 text-xs font-bold text-gray-900 shadow-sm hover:brightness-95"
-              >
-                카카오톡 공유
-              </button>
-              <a
-                href={xShareUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-gray-700 shadow-sm hover:bg-white"
-              >
-                X 공유
-              </a>
             </div>
           )}
 
