@@ -15,7 +15,7 @@ export type VerdictLine = {
   line: string;
 };
 
-export const MODEL_ID = "claude-sonnet-4-5";
+export const MODEL_ID = "claude-sonnet-4-6";
 export const MODEL_DISPLAY = "Claude Sonnet";
 const MODEL = MODEL_ID;
 const MIN_TURNS = 4;
