@@ -400,9 +400,8 @@ export function CouncilClient({
 
           await navigator.share({
             title: "MBTI 토론 판결문",
-            text: `${data.question} — ${data.types.join(" × ")} 토론`,
+            text: `${data.question} — ${data.types.join(" × ")} 토론\n${window.location.href}`,
             files: [file],
-            url: window.location.href,
           });
           return;
         }
