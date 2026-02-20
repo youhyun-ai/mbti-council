@@ -14,9 +14,15 @@ export type CouncilRow = {
 
 export async function saveCouncil(row: Omit<CouncilRow, "created_at">): Promise<void> {
   try {
-    await db.from("councils").upsert(row);
-  } catch {
-    // fail silently — sharing won't work but council still runs
+    const { error } = await db.from("councils").upsert(row);
+
+    if (error) {
+      console.error("[saveCouncil] Failed to upsert council:", error, { councilId: row.id });
+      throw error;
+    }
+  } catch (error) {
+    console.error("[saveCouncil] Unexpected error while saving council:", error, { councilId: row.id });
+    throw error;
   }
 }
 
