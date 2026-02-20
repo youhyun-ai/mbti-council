@@ -43,37 +43,41 @@ async function loadFont(weight: 700 | 800) {
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const format = request.nextUrl.searchParams.get("format") ?? "story";
-  const isSquare = format === "square";
-
-  // Fetch council data from the API endpoint (avoids direct DB import in edge runtime)
-  const origin = request.nextUrl.origin;
-  const councilRes = await fetch(`${origin}/api/council/${id}`, {
-    headers: { "Cache-Control": "no-cache" },
-  });
-
-  if (!councilRes.ok) {
-    return new Response("Not found", { status: 404 });
-  }
-
-  const council = (await councilRes.json()) as CouncilData;
-  if (council.status !== "done") {
-    return new Response("Not found", { status: 404 });
-  }
-
-  const winner = determineWinner(council.messages, council.types);
-  const verdictLines = council.verdict ?? [];
-  const winnerQuote = verdictLines.find((v) => v.type === winner)?.line ?? null;
-
-  let fonts: ArrayBuffer[] = [];
   try {
-    fonts = await Promise.all([loadFont(700), loadFont(800)]);
-  } catch {
-    fonts = [];
-  }
+    const { id } = await params;
+    const format = request.nextUrl.searchParams.get("format") ?? "story";
+    const isSquare = format === "square";
 
-  return new ImageResponse(
+    // Fetch council data from the API endpoint (avoids direct DB import in edge runtime)
+    const origin = request.nextUrl.origin;
+    const councilRes = await fetch(`${origin}/api/council/${id}`, {
+      headers: { "Cache-Control": "no-cache" },
+    });
+
+    if (!councilRes.ok) {
+      console.error(`[card] Council fetch failed: ${councilRes.status} ${councilRes.statusText}`);
+      return new Response("Not found", { status: 404 });
+    }
+
+    const council = (await councilRes.json()) as CouncilData;
+    if (council.status !== "done") {
+      console.log(`[card] Council not done yet: ${council.status}`);
+      return new Response("Not found", { status: 404 });
+    }
+
+    const winner = determineWinner(council.messages, council.types);
+    const verdictLines = council.verdict ?? [];
+    const winnerQuote = verdictLines.find((v) => v.type === winner)?.line ?? null;
+
+    let fonts: ArrayBuffer[] = [];
+    try {
+      fonts = await Promise.all([loadFont(700), loadFont(800)]);
+    } catch (e) {
+      console.error("[card] Font load failed:", e);
+      fonts = [];
+    }
+
+    return new ImageResponse(
     renderCard({
       councilId: id,
       question: council.question,
@@ -97,5 +101,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
       },
     }
-  );
+    );
+  } catch (error) {
+    console.error("[card] Unhandled error:", error);
+    return new Response(`Error generating card: ${error}`, { status: 500 });
+  }
 }
