@@ -1,5 +1,3 @@
-import { MBTI_TYPES } from "@/app/lib/mbti";
-
 type VerdictLine = { type: string; line: string };
 
 type CardProps = {
@@ -11,8 +9,6 @@ type CardProps = {
   verdictLines: VerdictLine[];
   isSquare: boolean;
 };
-
-const META = Object.fromEntries(MBTI_TYPES.map((t) => [t.code, t]));
 
 function truncate(input: string, limit: number) {
   return input.length > limit ? `${input.slice(0, limit - 1)}…` : input;
@@ -29,8 +25,6 @@ export function renderCard({
 }: CardProps) {
   const w = 1080;
   const h = isSquare ? 1080 : 1920;
-  const wMeta = META[winner];
-
   return (
     <div
       style={{
@@ -69,7 +63,7 @@ export function renderCard({
               backgroundColor: "#1f2937",
             }}
           >
-            {(META[code]?.emoji ?? "•") + " " + code}
+            {code}
           </div>
         ))}
       </div>
@@ -87,7 +81,7 @@ export function renderCard({
       >
         <div style={{ fontSize: 30, fontWeight: 700 }}>🏆 판결</div>
         <div style={{ marginTop: 8, fontSize: 52, fontWeight: 800, lineHeight: 1.2 }}>
-          {(wMeta?.emoji ?? "🏆") + " " + winner + " 승"}
+          {winner + " 승"}
         </div>
         <div style={{ marginTop: 14, fontSize: 34, lineHeight: 1.35 }}>
           {winnerQuote ? truncate(winnerQuote, 72) : "이 토론에서는 모두가 열정적이었습니다 🔥"}
@@ -98,7 +92,7 @@ export function renderCard({
         <div style={{ marginTop: 24, display: "flex", flexDirection: "column" }}>
           {verdictLines.slice(0, 3).map((v) => (
             <div key={v.type} style={{ fontSize: 28, lineHeight: 1.35, marginBottom: 8, opacity: 0.95 }}>
-              {(META[v.type]?.emoji ?? "•") + " " + v.type + ": " + truncate(v.line, 56)}
+              {v.type + ": " + truncate(v.line, 56)}
             </div>
           ))}
         </div>
