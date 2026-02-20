@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-import { getCouncil } from "@/lib/council-db";
 import { renderCard } from "./card-template";
 
 export const runtime = "nodejs";
@@ -12,6 +11,14 @@ const FONT_URLS = {
 } as const;
 
 type Msg = { type: string; content: string };
+type Council = {
+  id: string;
+  question: string;
+  types: string[];
+  messages: Msg[];
+  verdict: Array<{ type: string; line: string }> | null;
+  status: "done" | "in-progress" | "error";
+};
 
 function determineWinner(messages: Msg[], types: string[]): string {
   const counts = new Map<string, { msgs: number; chars: number }>();
@@ -33,13 +40,19 @@ async function loadFont(weight: 700 | 800) {
   return res.arrayBuffer();
 }
 
+async function fetchCouncil(origin: string, id: string): Promise<Council | null> {
+  const res = await fetch(`${origin}/api/council/${id}`, { cache: "no-store" });
+  if (!res.ok) return null;
+  return (await res.json()) as Council;
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const format = request.nextUrl.searchParams.get("format") ?? "story";
     const isSquare = format === "square";
 
-    const council = await getCouncil(id);
+    const council = await fetchCouncil(request.nextUrl.origin, id);
     if (!council || council.status !== "done") {
       return new Response("Not found", { status: 404 });
     }
