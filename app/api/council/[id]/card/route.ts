@@ -50,9 +50,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     // Fetch council data from the API endpoint (avoids direct DB import in edge runtime)
     const origin = request.nextUrl.origin;
+    console.log(`[card] Fetching from: ${origin}/api/council/${id}`);
+    
     const councilRes = await fetch(`${origin}/api/council/${id}`, {
       headers: { "Cache-Control": "no-cache" },
     });
+
+    console.log(`[card] Response status: ${councilRes.status}`);
 
     if (!councilRes.ok) {
       console.error(`[card] Council fetch failed: ${councilRes.status} ${councilRes.statusText}`);
@@ -60,6 +64,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     const council = (await councilRes.json()) as CouncilData;
+    console.log(`[card] Council data:`, { status: council.status, types: council.types });
+    
     if (council.status !== "done") {
       console.log(`[card] Council not done yet: ${council.status}`);
       return new Response("Not found", { status: 404 });
@@ -68,15 +74,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const winner = determineWinner(council.messages, council.types);
     const verdictLines = council.verdict ?? [];
     const winnerQuote = verdictLines.find((v) => v.type === winner)?.line ?? null;
+    
+    console.log(`[card] Winner: ${winner}, verdict lines: ${verdictLines.length}`);
 
     let fonts: ArrayBuffer[] = [];
     try {
       fonts = await Promise.all([loadFont(700), loadFont(800)]);
+      console.log(`[card] Fonts loaded successfully`);
     } catch (e) {
       console.error("[card] Font load failed:", e);
       fonts = [];
     }
 
+    console.log(`[card] Generating ImageResponse...`);
     return new ImageResponse(
     renderCard({
       councilId: id,
