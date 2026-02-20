@@ -1,19 +1,10 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
+import { getCouncil } from "@/lib/council-db";
 import { renderCard } from "./card-template";
 
-export const runtime = "edge";
-
-type CouncilData = {
-  id: string;
-  question: string;
-  language: string;
-  types: string[];
-  messages: Array<{ id: number; type: string; content: string; replyTo: number | null }>;
-  verdict: Array<{ type: string; line: string }> | null;
-  status: "done" | "in-progress" | "error";
-};
+export const runtime = "nodejs";
 
 const FONT_URLS = {
   700: "https://fonts.gstatic.com/s/notosanskr/v39/PbyxFmXiEBPT4ITbgNA5Cgms3VYcOA-vvnIzzg01eLQ.ttf",
@@ -48,45 +39,22 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const format = request.nextUrl.searchParams.get("format") ?? "story";
     const isSquare = format === "square";
 
-    // Fetch council data from the API endpoint (avoids direct DB import in edge runtime)
-    const origin = request.nextUrl.origin;
-    console.log(`[card] Fetching from: ${origin}/api/council/${id}`);
-    
-    const councilRes = await fetch(`${origin}/api/council/${id}`, {
-      headers: { "Cache-Control": "no-cache" },
-    });
-
-    console.log(`[card] Response status: ${councilRes.status}`);
-
-    if (!councilRes.ok) {
-      console.error(`[card] Council fetch failed: ${councilRes.status} ${councilRes.statusText}`);
-      return new Response("Not found", { status: 404 });
-    }
-
-    const council = (await councilRes.json()) as CouncilData;
-    console.log(`[card] Council data:`, { status: council.status, types: council.types });
-    
-    if (council.status !== "done") {
-      console.log(`[card] Council not done yet: ${council.status}`);
+    const council = await getCouncil(id);
+    if (!council || council.status !== "done") {
       return new Response("Not found", { status: 404 });
     }
 
     const winner = determineWinner(council.messages, council.types);
     const verdictLines = council.verdict ?? [];
     const winnerQuote = verdictLines.find((v) => v.type === winner)?.line ?? null;
-    
-    console.log(`[card] Winner: ${winner}, verdict lines: ${verdictLines.length}`);
 
     let fonts: ArrayBuffer[] = [];
     try {
       fonts = await Promise.all([loadFont(700), loadFont(800)]);
-      console.log(`[card] Fonts loaded successfully`);
-    } catch (e) {
-      console.error("[card] Font load failed:", e);
+    } catch {
       fonts = [];
     }
 
-    console.log(`[card] Generating ImageResponse...`);
     return new ImageResponse(
     renderCard({
       councilId: id,
