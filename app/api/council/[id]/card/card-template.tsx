@@ -36,7 +36,7 @@ export function renderCard({ councilId, question, types, winner, winnerQuote, ve
 
       <div style={{ fontSize: 30, marginTop: 24 }}>참여 유형: {types.join(", ")}</div>
 
-      <div style={{ fontSize: isSquare ? 40 : 48, fontWeight: 800, marginTop: 28 }}>🏆 승자: {winner}</div>
+      <div style={{ fontSize: isSquare ? 40 : 48, fontWeight: 800, marginTop: 28 }}>승자: {winner}</div>
 
       <div style={{ fontSize: 30, marginTop: 16, lineHeight: 1.35 }}>
         {winnerQuote ? truncate(winnerQuote, 72) : "이 토론에서는 모두가 열정적이었습니다."}
