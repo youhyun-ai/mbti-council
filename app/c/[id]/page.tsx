@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getCouncil } from "@/lib/council-db";
 import { CouncilClient } from "./council-client";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{

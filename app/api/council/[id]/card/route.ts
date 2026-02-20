@@ -1,10 +1,19 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
 
-import { getCouncil } from "@/lib/council-db";
 import { renderCard } from "./card-template";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
+
+type CouncilData = {
+  id: string;
+  question: string;
+  language: string;
+  types: string[];
+  messages: Array<{ id: number; type: string; content: string; replyTo: number | null }>;
+  verdict: Array<{ type: string; line: string }> | null;
+  status: "done" | "in-progress" | "error";
+};
 
 const FONT_URLS = {
   700: "https://fonts.gstatic.com/s/notosanskr/v39/PbyxFmXiEBPT4ITbgNA5Cgms3VYcOA-vvnIzzg01eLQ.ttf",
@@ -38,8 +47,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const format = request.nextUrl.searchParams.get("format") ?? "story";
   const isSquare = format === "square";
 
-  const council = await getCouncil(id);
-  if (!council || council.status !== "done") {
+  // Fetch council data from the API endpoint (avoids direct DB import in edge runtime)
+  const origin = request.nextUrl.origin;
+  const councilRes = await fetch(`${origin}/api/council/${id}`, {
+    headers: { "Cache-Control": "no-cache" },
+  });
+
+  if (!councilRes.ok) {
+    return new Response("Not found", { status: 404 });
+  }
+
+  const council = (await councilRes.json()) as CouncilData;
+  if (council.status !== "done") {
     return new Response("Not found", { status: 404 });
   }
 
@@ -74,7 +93,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               { name: "Noto Sans KR", data: fonts[1], weight: 800 as const, style: "normal" as const },
             ]
           : undefined,
-      emoji: "noto",
       headers: {
         "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
       },
