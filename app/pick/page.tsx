@@ -91,7 +91,7 @@ export default function PickPage() {
 
         <div className="mt-3 rounded-xl bg-white/80 p-3 text-sm shadow-sm ring-1 ring-gray-200">
           <span className="font-extrabold">{selected.length}명</span> 합류 중
-          {selected.length >= 3 ? <span className="ml-1 text-rose-500">· 꽉 참 🔥</span> : <span className="text-gray-400"> (최대 3명)</span>}
+          {selected.length >= 3 ? <span className="ml-1 text-rose-500">· 꽉 참 🔥</span> : <span className="text-gray-400"> (딱 3명)</span>}
         </div>
 
         <form className="mt-5 space-y-5" onSubmit={onSubmit}>
