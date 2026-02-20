@@ -79,12 +79,12 @@ export function renderCard({
           flexDirection: "column",
         }}
       >
-        <div style={{ fontSize: 30, fontWeight: 700 }}>🏆 판결</div>
+        <div style={{ fontSize: 30, fontWeight: 700 }}>판결</div>
         <div style={{ marginTop: 8, fontSize: 52, fontWeight: 800, lineHeight: 1.2 }}>
           {winner + " 승"}
         </div>
         <div style={{ marginTop: 14, fontSize: 34, lineHeight: 1.35 }}>
-          {winnerQuote ? truncate(winnerQuote, 72) : "이 토론에서는 모두가 열정적이었습니다 🔥"}
+          {winnerQuote ? truncate(winnerQuote, 72) : "이 토론에서는 모두가 열정적이었습니다"}
         </div>
       </div>
 
