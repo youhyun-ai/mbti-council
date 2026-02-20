@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 
 import { renderCard } from "./card-template";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 const FONT_URLS = {
   700: "https://fonts.gstatic.com/s/notosanskr/v39/PbyxFmXiEBPT4ITbgNA5Cgms3VYcOA-vvnIzzg01eLQ.ttf",
