@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 import { getCouncil } from "@/lib/council-db";
 import { renderCard } from "./card-template";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 const FONT_URLS = {
   700: "https://fonts.gstatic.com/s/notosanskr/v39/PbyxFmXiEBPT4ITbgNA5Cgms3VYcOA-vvnIzzg01eLQ.ttf",
@@ -74,6 +74,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               { name: "Noto Sans KR", data: fonts[1], weight: 800 as const, style: "normal" as const },
             ]
           : undefined,
+      emoji: "noto",
       headers: {
         "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
       },
