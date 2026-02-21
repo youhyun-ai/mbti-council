@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GROUP_STYLES, MBTI_TYPES } from "@/app/lib/mbti";
+import { AdSlot } from "@/app/components/ads";
 
 type CouncilMessage = {
   id: number;
@@ -468,9 +469,10 @@ export function CouncilClient({
         </div>
       </header>
 
-      {/* ── Messages ── */}
-      <div className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="mx-auto max-w-2xl space-y-3">
+      {/* ── Messages + Desktop Sidebar Ad ── */}
+      <div className="flex min-h-0 flex-1">
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
+          <div className="mx-auto max-w-2xl space-y-3">
           {groupedMessages.map((group) => {
             // USER bubble — right-aligned
             if (group.speaker === "USER") {
@@ -579,6 +581,13 @@ export function CouncilClient({
             </div>
           )}
 
+          {/* Inline result ad (after verdict/result) */}
+          {data.status === "done" && overtimeStatus === "idle" ? (
+            <div className="px-1 py-1">
+              <AdSlot placement="inline" />
+            </div>
+          ) : null}
+
           {/* Share buttons */}
           {data.status === "done" && overtimeStatus === "idle" && (
             <div className="flex gap-2 px-1 pb-1">
@@ -614,10 +623,26 @@ export function CouncilClient({
             </div>
           )}
 
-          {/* Scroll anchor */}
-          <div ref={bottomRef} className="h-1" />
+            {/* Scroll anchor */}
+            <div ref={bottomRef} className="h-1" />
+          </div>
         </div>
+
+        <aside className="hidden w-[320px] shrink-0 border-l border-gray-200/80 bg-white/40 p-3 xl:block">
+          <div className="sticky top-3">
+            <AdSlot placement="sidebar" />
+          </div>
+        </aside>
       </div>
+
+      {/* ── Mobile sticky ad (non-intrusive) ── */}
+      {data.status === "done" ? (
+        <div className="shrink-0 border-t border-gray-200 bg-white/90 px-3 py-2 xl:hidden">
+          <div className="mx-auto max-w-2xl">
+            <AdSlot placement="mobile" />
+          </div>
+        </div>
+      ) : null}
 
       {/* ── KakaoTalk-style Input Bar ── */}
       <div className="shrink-0 border-t border-gray-200 bg-white px-3 py-2 pb-safe">
