@@ -381,7 +381,7 @@ export function CouncilClient({
   const handleCardShare = async () => {
     if (typeof window === "undefined") return;
 
-    const cardUrl = `${window.location.origin}/api/council/${data.id}/card`;
+    const cardUrl = `${window.location.origin}/api/council/${data.id}/card/verdict`;
 
     if (navigator.canShare && navigator.share) {
       try {
