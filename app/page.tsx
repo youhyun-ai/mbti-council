@@ -1,6 +1,25 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { LandingDemo } from "@/app/components/LandingDemo";
 import { getCouncilCount } from "@/lib/counter";
+
+export const metadata: Metadata = {
+  title: "MBTI Council | MBTI 성격 토론·궁합·운세",
+  description: "MBTI 성격 유형 토론, MBTI 궁합 질문, 오늘의 MBTI 운세까지 공유 가능한 카드로 즐겨보세요.",
+  keywords: ["MBTI 성격", "MBTI 궁합", "MBTI 토론", "MBTI 운세", "성격유형"],
+  openGraph: {
+    title: "MBTI Council | MBTI 성격 토론·궁합·운세",
+    description: "MBTI 성격 유형 토론, 궁합, 운세를 한 곳에서.",
+    images: ["/api/council/0520f5fc-3d8c-49c8-b430-42c1649dc50e/card?format=square"],
+    locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MBTI Council",
+    description: "MBTI 성격 토론·궁합·운세",
+    images: ["/api/council/0520f5fc-3d8c-49c8-b430-42c1649dc50e/card?format=square"],
+  },
+};
 
 export const dynamic = "force-dynamic"; // always fetch fresh count
 

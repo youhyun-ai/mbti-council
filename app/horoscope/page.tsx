@@ -1,6 +1,25 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { MBTI_TYPES } from "@/app/lib/mbti";
+
+export const metadata: Metadata = {
+  title: "오늘의 MBTI 운세 | 연애·커리어·행운·인간관계",
+  description: "MBTI 성격 기반 오늘의 운세. 내 유형의 연애/커리어/행운/인간관계 운세를 30초 안에 확인하세요.",
+  keywords: ["MBTI 운세", "오늘의 운세", "MBTI 성격", "연애 운세", "인간관계 운세"],
+  openGraph: {
+    title: "오늘의 MBTI 운세",
+    description: "MBTI 성격 기반 데일리 운세를 바로 확인해보세요.",
+    images: ["/api/horoscope/INTJ/2026-02-25/card"],
+    locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "오늘의 MBTI 운세",
+    description: "MBTI 성격 기반 데일리 운세",
+    images: ["/api/horoscope/INTJ/2026-02-25/card"],
+  },
+};
 
 function todayKST() {
   return new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" }).format(new Date());

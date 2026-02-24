@@ -21,20 +21,23 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const saved = await getCouncil(id);
   const question = saved?.question || sp.question || "MBTI 토론회";
   const types = saved ? saved.types.join(" × ") : (sp.types ? sp.types.split(",").join(" × ") : "MBTI 패널");
-  const description = `${types}의 토론 — ${question} — vitric.ai`;
+  const description = `${types}의 MBTI 토론 — ${question} | MBTI 성격/궁합/토론 공유 카드`; 
   const cardImage = `/api/council/${id}/card?format=square`;
 
   return {
-    title: question,
+    title: `${question} | MBTI 토론회`,
     description,
+    keywords: ["MBTI 토론", "MBTI 성격", "MBTI 궁합", "성격유형 토론"],
     openGraph: {
-      title: question,
+      title: `${question} | MBTI 토론회`,
       description,
       images: [cardImage],
+      locale: "ko_KR",
+      type: "article",
     },
     twitter: {
       card: "summary_large_image",
-      title: question,
+      title: `${question} | MBTI 토론회`,
       description,
       images: [cardImage],
     },
