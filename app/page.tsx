@@ -44,12 +44,20 @@ export default async function HomePage() {
           성격 다른 셋 부르면 단톡방이 열림.<br />내 고민, 걔네한테 맡겨봐.
         </p>
 
-        <Link
-          href="/pick"
-          className="mt-8 inline-flex min-h-14 items-center justify-center rounded-2xl bg-gray-900 px-8 text-lg font-extrabold text-white shadow-lg shadow-gray-900/20 transition hover:-translate-y-0.5 hover:bg-black"
-        >
-          단톡 열기 →
-        </Link>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/pick"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-gray-900 px-8 text-lg font-extrabold text-white shadow-lg shadow-gray-900/20 transition hover:-translate-y-0.5 hover:bg-black"
+          >
+            단톡 열기 →
+          </Link>
+          <Link
+            href="/horoscope"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-fuchsia-200 bg-fuchsia-50 px-6 text-base font-bold text-fuchsia-800 shadow-sm transition hover:-translate-y-0.5 hover:border-fuchsia-300"
+          >
+            오늘의 운세 보기 →
+          </Link>
+        </div>
       </section>
 
       <LandingDemo />
