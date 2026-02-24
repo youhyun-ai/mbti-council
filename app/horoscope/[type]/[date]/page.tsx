@@ -16,9 +16,26 @@ function validDate(date: string) {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { type, date } = await params;
   const up = type.toUpperCase();
+  const cardImage = `/api/horoscope/${up}/${date}/card`;
+  const description = `${up}의 ${date} MBTI 운세 | 연애·커리어·행운·인간관계 한 번에 확인`;
+
   return {
-    title: `${up} 오늘의 운세 (${date})`,
-    description: `${up}의 ${date} 연애/커리어/행운/인간관계 운세`,
+    title: `${up} 오늘의 MBTI 운세 (${date})`,
+    description,
+    keywords: ["MBTI 운세", "오늘의 운세", "MBTI 성격", "연애 운세", "커리어 운세"],
+    openGraph: {
+      title: `${up} 오늘의 MBTI 운세`,
+      description,
+      images: [cardImage],
+      locale: "ko_KR",
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${up} 오늘의 MBTI 운세`,
+      description,
+      images: [cardImage],
+    },
   };
 }
 
