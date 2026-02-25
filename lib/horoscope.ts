@@ -133,7 +133,7 @@ async function generateDailyHoroscopeUncached(type: MbtiType, date: string): Pro
 
 const getDailyHoroscopeCached = unstable_cache(
   async (type: MbtiType, date: string) => generateDailyHoroscopeUncached(type, date),
-  ["daily-horoscope-v3"],
+  (type: MbtiType, date: string) => ["daily-horoscope-v3", type, date],
   {
     revalidate: 60 * 60 * 24 * 30,
     tags: ["daily-horoscope"],
