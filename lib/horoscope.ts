@@ -131,22 +131,22 @@ async function generateDailyHoroscopeUncached(type: MbtiType, date: string): Pro
   return { type, date, ...parsed };
 }
 
-const getDailyHoroscopeCached = unstable_cache(
-  async (type: MbtiType, date: string) => generateDailyHoroscopeUncached(type, date),
-  ["daily-horoscope-v3"],
-  {
-    revalidate: 60 * 60 * 24 * 30,
-    tags: ["daily-horoscope"],
-  }
-);
-
 export async function generateDailyHoroscope(typeRaw: string, date: string): Promise<DailyHoroscope> {
   const type = typeRaw.toUpperCase();
   if (!isValidMbtiType(type)) throw new Error("Invalid MBTI type");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Invalid date format");
 
+  const getDailyHoroscopeCached = unstable_cache(
+    async () => generateDailyHoroscopeUncached(type, date),
+    ["daily-horoscope-v4", type, date],
+    {
+      revalidate: 60 * 60 * 24 * 30,
+      tags: ["daily-horoscope", `daily-horoscope:${type}:${date}`],
+    }
+  );
+
   try {
-    return await getDailyHoroscopeCached(type, date);
+    return await getDailyHoroscopeCached();
   } catch (error) {
     console.error("[horoscope] generation failed", {
       type,
