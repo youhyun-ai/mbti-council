@@ -57,6 +57,12 @@ export default async function HomePage() {
           >
             오늘의 운세 보기 →
           </Link>
+          <Link
+            href="/balance"
+            className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-indigo-200 bg-indigo-50 px-6 text-base font-bold text-indigo-800 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300"
+          >
+            MBTI 밸런스 게임 →
+          </Link>
         </div>
       </section>
 
