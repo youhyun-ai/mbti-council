@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { generateDailyHoroscope } from "@/lib/horoscope";
 import { isValidMbtiType } from "@/lib/mbti";
+import { ShareButton } from "./ShareButton";
 
 type PageProps = {
   params: Promise<{ type: string; date: string }>;
@@ -34,7 +35,7 @@ export default async function HoroscopeResultPage({ params }: PageProps) {
     <main className="min-h-screen bg-gradient-to-b from-fuchsia-50 via-white to-amber-50 px-4 py-8 text-gray-900">
       <div className="mx-auto max-w-2xl rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-xs font-bold text-fuchsia-700">{data.date} · 오늘의 운세</p>
-        <h1 className="mt-2 text-3xl font-black">{data.type} {data.title}</h1>
+        <h1 className="mt-2 text-3xl font-black">{data.title}</h1>
         <p className="mt-3 rounded-xl bg-fuchsia-50 px-4 py-3 text-sm text-gray-700">{data.overall}</p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -62,6 +63,7 @@ export default async function HoroscopeResultPage({ params }: PageProps) {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2">
+          <ShareButton type={up} date={date} />
           <Link href="/horoscope" className="rounded-full bg-gray-900 px-4 py-2 text-xs font-bold text-white">
             다른 유형 보기
           </Link>
