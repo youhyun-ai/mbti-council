@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { unstable_cache } from "next/cache";
 
 import { isValidMbtiType, type MbtiType } from "@/lib/mbti";
 
@@ -16,7 +17,6 @@ export type DailyHoroscope = {
 };
 
 let client: Anthropic | null = null;
-const cache = new Map<string, DailyHoroscope>();
 
 function getClient() {
   if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is missing");
@@ -62,17 +62,9 @@ function parseJson(text: string): Omit<DailyHoroscope, "type" | "date"> | null {
   }
 }
 
-export async function generateDailyHoroscope(typeRaw: string, date: string): Promise<DailyHoroscope> {
-  const type = typeRaw.toUpperCase();
-  if (!isValidMbtiType(type)) throw new Error("Invalid MBTI type");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Invalid date format");
-
-  const key = `${type}:${date}`;
-  const cached = cache.get(key);
-  if (cached) return cached;
-
+async function generateDailyHoroscopeUncached(type: MbtiType, date: string): Promise<DailyHoroscope> {
   const prompt = [
-    `MBTI council가 합의해서 만든 오늘의 MBTI 운세를 작성해줘.`,
+    "MBTI council가 합의해서 만든 오늘의 MBTI 운세를 작성해줘.",
     "형식은 토론 로그가 아니라 최종 운세 요약본이어야 해.",
     `MBTI: ${type}`,
     `날짜(한국): ${date}`,
@@ -87,12 +79,18 @@ export async function generateDailyHoroscope(typeRaw: string, date: string): Pro
   ].join("\n");
 
   try {
-    const res = await getClient().messages.create({
-      model: "claude-sonnet-4-6",
-      temperature: 0.2,
-      max_tokens: 500,
-      messages: [{ role: "user", content: prompt }],
-    });
+    // Fail fast on upstream slowness; fallback keeps UX snappy.
+    const res = await Promise.race([
+      getClient().messages.create({
+        model: "claude-sonnet-4-6",
+        temperature: 0.2,
+        max_tokens: 500,
+        messages: [{ role: "user", content: prompt }],
+      }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Horoscope generation timeout")), 4500)
+      ),
+    ]);
 
     const text = res.content
       .filter((b) => b.type === "text")
@@ -100,15 +98,25 @@ export async function generateDailyHoroscope(typeRaw: string, date: string): Pro
       .join("\n");
 
     const parsed = parseJson(text);
-    const value: DailyHoroscope = parsed
-      ? { type, date, ...parsed }
-      : fallback(type, date);
-
-    cache.set(key, value);
-    return value;
+    return parsed ? { type, date, ...parsed } : fallback(type, date);
   } catch {
-    const value = fallback(type, date);
-    cache.set(key, value);
-    return value;
+    return fallback(type, date);
   }
+}
+
+const getDailyHoroscopeCached = unstable_cache(
+  async (type: MbtiType, date: string) => generateDailyHoroscopeUncached(type, date),
+  ["daily-horoscope-v2"],
+  {
+    revalidate: 60 * 60 * 24 * 30,
+    tags: ["daily-horoscope"],
+  }
+);
+
+export async function generateDailyHoroscope(typeRaw: string, date: string): Promise<DailyHoroscope> {
+  const type = typeRaw.toUpperCase();
+  if (!isValidMbtiType(type)) throw new Error("Invalid MBTI type");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Invalid date format");
+
+  return getDailyHoroscopeCached(type, date);
 }
